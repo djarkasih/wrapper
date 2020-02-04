@@ -5,12 +5,16 @@
  */
 package id.chataja.security.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  *
  * @author ahmad
  */
 public class TokenData {
     
+    @JsonIgnore
+    private String clientAddress;
     private final String email;
     private final String mobileNumber;
     private final String fullname;
@@ -19,6 +23,14 @@ public class TokenData {
         this.email = email;
         this.mobileNumber = mobileNumber;
         this.fullname = fullname;
+    }
+
+    public String getClientAddress() {
+        return clientAddress;
+    }
+
+    public void setClientAddress(String clientAddress) {
+        this.clientAddress = clientAddress;
     }
 
     public String getEmail() {

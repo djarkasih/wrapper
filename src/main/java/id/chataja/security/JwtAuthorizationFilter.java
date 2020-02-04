@@ -6,8 +6,10 @@
 package id.chataja.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import id.chataja.security.services.UserQueue;
 import id.chataja.security.model.TokenData;
 import id.chataja.security.services.TokenService;
+import id.chataja.util.Misc;
 import id.chataja.util.rest.ErrorEnvelope;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -22,8 +24,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,28 +38,40 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     
 //    Logger myLogger = LoggerFactory.getLogger(JwtAuthorizationFilter.class);
 
+    private ObjectMapper mapper;
     private TokenService tokenService;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, TokenService tokenService) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, ObjectMapper mapper, TokenService tokenService) {
         super(authenticationManager);
+        this.mapper = mapper;
         this.tokenService = tokenService;
     }
 
-    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest req) throws ExpiredJwtException, MalformedJwtException, UnsupportedJwtException, SignatureException, IllegalArgumentException {
+    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest req) throws ExpiredJwtException, MalformedJwtException, UnsupportedJwtException, SignatureException, IllegalArgumentException, DifferentClientException {
         
         String token = req.getHeader(TokenService.AUTHORIZATION_HEADER);
 //        myLogger.info("token = " + token);
         
+        TokenData data = null;
+        boolean isValid = false;
+        
         if (token != null) {
             try {
-                
-                TokenData data = tokenService.readTokenData(token.replace(TokenService.TOKEN_PREFIX, ""));
+                String address = Misc.getClientAddress(req);
+                data = tokenService.readTokenData(token.replace(TokenService.TOKEN_PREFIX, ""));
 //                myLogger.info("tokenData = " + data.toString());
-                return new UsernamePasswordAuthenticationToken(data.getEmail(), null, new ArrayList<>());
+                isValid = data.getClientAddress().equalsIgnoreCase(address);
+                if (!isValid) {
+                    throw new DifferentClientException("Expecting " + data.getClientAddress() + " instead of " + address);
+                }
                 
             } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | SignatureException | IllegalArgumentException ex) {
                 throw ex;
             }            
+        }
+        
+        if (isValid && (data != null)) {
+            return new UsernamePasswordAuthenticationToken(data.getEmail(), null, new ArrayList<>());
         }
         
         return null;
@@ -70,7 +82,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         String header = req.getHeader(TokenService.AUTHORIZATION_HEADER);
 
-        logger.info("uri = " + req.getRequestURI());
+//        logger.info("uri = " + req.getRequestURI());
         
         if (header == null || !header.startsWith(TokenService.TOKEN_PREFIX)) {
             chain.doFilter(req, res);
@@ -82,7 +94,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         try {
             authentication = getAuthentication(req);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | SignatureException | IllegalArgumentException ex) {
+        } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | SignatureException | IllegalArgumentException | DifferentClientException ex) {
             msgs = new HashMap();
             
             msgs.put("exception", ex.getClass().getCanonicalName());
@@ -96,11 +108,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             
             res.setStatus(HttpStatus.BAD_REQUEST.value());
             res.setContentType("application/json");
-
-            ObjectMapper mapper = new ObjectMapper();
             
             PrintWriter out = res.getWriter(); 
-            out.print(mapper.writeValueAsString(env));
+            out.print(this.mapper.writeValueAsString(env));
             out.flush();
 
             return; 

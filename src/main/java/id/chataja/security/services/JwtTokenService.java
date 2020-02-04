@@ -19,8 +19,6 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -32,7 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
 public class JwtTokenService implements TokenService {
 
     private final Key key;
-    @Value("${wrapper.token.timeout}")
+    @Value("#{'${wrapper.token.timeout}'.replace('_','')}")
     private long timeout;
     
     @Autowired
@@ -52,6 +50,7 @@ public class JwtTokenService implements TokenService {
         builder.setIssuer("CHATAJA");
         builder.setIssuedAt(Date.from(Instant.now()));
         builder.setExpiration(expiredAt);
+        builder.claim("clientAddress", data.getClientAddress());
         builder.claim("fullname", data.getFullname());
         builder.claim("mobileNo", data.getMobileNumber());
         
@@ -79,6 +78,7 @@ public class JwtTokenService implements TokenService {
                     claims.getBody().get("mobileNo").toString(),
                     claims.getBody().get("fullname").toString()
             );
+            data.setClientAddress(claims.getBody().get("clientAddress").toString());
         } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | SignatureException | IllegalArgumentException ex) {
             throw ex;
         }

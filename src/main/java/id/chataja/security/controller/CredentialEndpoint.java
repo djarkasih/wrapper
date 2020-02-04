@@ -7,11 +7,13 @@ package id.chataja.security.controller;
 
 import id.chataja.security.model.TokenData;
 import id.chataja.security.services.TokenService;
+import id.chataja.security.services.UserQueue;
+import id.chataja.util.Misc;
 import id.chataja.util.rest.SimpleEnvelope;
 import java.util.HashMap;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +31,9 @@ public class CredentialEndpoint {
     @Autowired
     private TokenService tokenService;
     
+    @Autowired
+    private UserQueue queue;
+        
     @GetMapping(value="/infoq")
     public ResponseEntity<Map<String,Object>> showInfo() {
         
@@ -40,9 +45,12 @@ public class CredentialEndpoint {
     }
 
     @PostMapping(value="/token")
-    public ResponseEntity<SimpleEnvelope> createToken(@RequestBody TokenData data) {
+    public ResponseEntity<SimpleEnvelope> createToken(HttpServletRequest req, @RequestBody TokenData data) {
         
         Map<String, String> out = new HashMap();
+        data.setClientAddress(Misc.getClientAddress(req));
+        
+        queue.push(data);
 
         String token = tokenService.createToken(data);
         out.put("userid", data.getEmail());
@@ -50,10 +58,10 @@ public class CredentialEndpoint {
         
         SimpleEnvelope env = new SimpleEnvelope(out,true,HttpStatus.OK.value());
         
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(TokenService.AUTHORIZATION_HEADER, TokenService.TOKEN_PREFIX + token);
+        //HttpHeaders headers = new HttpHeaders();
+        //headers.set(TokenService.AUTHORIZATION_HEADER, TokenService.TOKEN_PREFIX + token);
 
-        return new ResponseEntity(env,headers,HttpStatus.OK);
+        return new ResponseEntity(env,HttpStatus.OK);
         
     } 
     

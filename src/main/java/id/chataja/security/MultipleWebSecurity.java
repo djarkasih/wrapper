@@ -5,6 +5,8 @@
  */
 package id.chataja.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import id.chataja.security.services.UserQueue;
 import id.chataja.security.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,8 +33,13 @@ public class MultipleWebSecurity {
     @Configuration
     @Order(1)                                                        
     public static class TokenServiceWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+        
+        @Autowired
+        private ObjectMapper mapper;
+        
         @Autowired
         private TokenService tokenService;
+        
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http.cors().and().csrf().disable().authorizeRequests()
@@ -40,7 +47,7 @@ public class MultipleWebSecurity {
                 .anyRequest().authenticated()
                 .and()
                 //.addFilterBefore(new ExceptionHandlerFilter(), JwtAuthorizationFilter.class)
-                .addFilterBefore(new JwtAuthorizationFilter(authenticationManager(),tokenService),UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthorizationFilter(authenticationManager(), mapper, tokenService),UsernamePasswordAuthenticationFilter.class)
                 // this disables session creation on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         }
