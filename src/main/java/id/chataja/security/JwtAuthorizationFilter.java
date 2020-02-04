@@ -36,7 +36,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
  */
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     
-    Logger myLogger = LoggerFactory.getLogger(JwtAuthorizationFilter.class);
+//    Logger myLogger = LoggerFactory.getLogger(JwtAuthorizationFilter.class);
 
     private TokenService tokenService;
 
@@ -48,13 +48,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest req) throws ExpiredJwtException, MalformedJwtException, UnsupportedJwtException, SignatureException, IllegalArgumentException {
         
         String token = req.getHeader(TokenService.AUTHORIZATION_HEADER);
-        myLogger.info("token = " + token);
+//        myLogger.info("token = " + token);
         
         if (token != null) {
             try {
                 
                 TokenData data = tokenService.readTokenData(token.replace(TokenService.TOKEN_PREFIX, ""));
-                myLogger.info("tokenData = " + data.toString());
+//                myLogger.info("tokenData = " + data.toString());
                 return new UsernamePasswordAuthenticationToken(data.getEmail(), null, new ArrayList<>());
                 
             } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | SignatureException | IllegalArgumentException ex) {

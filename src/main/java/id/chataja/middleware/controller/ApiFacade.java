@@ -34,7 +34,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RestController
 public class ApiFacade {
     
-    Logger logger = LoggerFactory.getLogger(ApiFacade.class);
+//    Logger logger = LoggerFactory.getLogger(ApiFacade.class);
     
     @Value("${wrapper.target.baseurl}")
     private String baseUrl;
@@ -90,27 +90,6 @@ public class ApiFacade {
         return res.getBody();
     }
     
-//    @GetMapping(value="/test/login")
-//    public ResponseEntity<Map<String,Object>> testLogin() {
-//        RestTemplate rest = new RestTemplate();
-//        
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Content-Type", "application/json");
-//        headers.set("QISCUS-SDK-APP-ID", "sdksample");
-//        headers.set("QISCUS-SDK-SECRET", "2820ae9dfc5362f7f3a10381fb89afc7");
-//        
-//        HttpEntity entity = new HttpEntity(headers);
-//        ParameterizedTypeReference<Map<String, Object>> typeRef = new ParameterizedTypeReference<Map<String, Object>>() {};
-//        ResponseEntity<Map<String,Object>> res = rest.exchange(
-//            "https://api.qiscus.com/api/v2.1/rest/user_profile?user_id=guest@qiscus.com", 
-//            HttpMethod.GET, 
-//            entity, 
-//            typeRef
-//        );
-//        
-//        return new ResponseEntity(res.getBody(),HttpStatus.OK);
-//    }
-
     @GetMapping(value="/info")
     public ResponseEntity<Map<String,Object>> showInfo() {
         
@@ -132,7 +111,7 @@ public class ApiFacade {
             req.getParameterMap()
         );
         
-        logger.info("reqd = " + reqd.toString());
+//        logger.info("reqd = " + reqd.toString());
         
         Map<String,Object> res = this.forwardRequest(reqd);
         
@@ -153,7 +132,7 @@ public class ApiFacade {
         );
         reqd.setBody(body);
                 
-        logger.info("reqd = " + reqd.toString());
+//        logger.info("reqd = " + reqd.toString());
         
         Map<String,Object> res = this.forwardRequest(reqd);
         
