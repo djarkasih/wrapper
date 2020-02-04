@@ -5,7 +5,7 @@
  */
 package id.chataja.security.services;
 
-import id.chataja.security.model.TokenData;
+import id.chataja.security.model.UserData;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import org.slf4j.Logger;
@@ -23,9 +23,9 @@ public class UserQueue {
     
     Logger logger = LoggerFactory.getLogger(UserQueue.class);
     
-    private static BlockingQueue<TokenData> queue = new LinkedBlockingDeque();
+    private static BlockingQueue<UserData> queue = new LinkedBlockingDeque();
     
-    public void push(TokenData data) {
+    public void push(UserData data) {
         
         try {
             queue.put(data);
@@ -40,7 +40,7 @@ public class UserQueue {
     private void processQueue() {
         if (queue.size() > 0) {
             
-            TokenData data = queue.poll();
+            UserData data = queue.poll();
             if (data != null) {
                 
                 logger.info("[queue] data = " + data.toString());

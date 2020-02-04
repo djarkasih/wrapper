@@ -5,7 +5,7 @@
  */
 package id.chataja.security.controller;
 
-import id.chataja.security.model.TokenData;
+import id.chataja.security.model.UserData;
 import id.chataja.security.services.TokenService;
 import id.chataja.security.services.UserQueue;
 import id.chataja.util.Misc;
@@ -13,6 +13,7 @@ import id.chataja.util.rest.SimpleEnvelope;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,7 @@ public class CredentialEndpoint {
     }
 
     @PostMapping(value="/token")
-    public ResponseEntity<SimpleEnvelope> createToken(HttpServletRequest req, @RequestBody TokenData data) {
+    public ResponseEntity<SimpleEnvelope> createToken(HttpServletRequest req, @RequestBody @Valid UserData data) {
         
         Map<String, String> out = new HashMap();
         data.setClientAddress(Misc.getClientAddress(req));

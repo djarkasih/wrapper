@@ -6,8 +6,7 @@
 package id.chataja.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import id.chataja.security.services.UserQueue;
-import id.chataja.security.model.TokenData;
+import id.chataja.security.model.UserData;
 import id.chataja.security.services.TokenService;
 import id.chataja.util.Misc;
 import id.chataja.util.rest.ErrorEnvelope;
@@ -52,7 +51,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String token = req.getHeader(TokenService.AUTHORIZATION_HEADER);
 //        myLogger.info("token = " + token);
         
-        TokenData data = null;
+        UserData data = null;
         boolean isValid = false;
         
         if (token != null) {

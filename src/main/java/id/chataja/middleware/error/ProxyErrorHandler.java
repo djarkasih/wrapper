@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * @author ahmad
  */
 @RestControllerAdvice
-public class GlobalHandler {
+public class ProxyErrorHandler {
 
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<Map<String,Object>> handleOtherExceptions(Exception ex, 

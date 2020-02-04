@@ -5,7 +5,7 @@
  */
 package id.chataja.security.services;
 
-import id.chataja.security.model.TokenData;
+import id.chataja.security.model.UserData;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -39,7 +39,7 @@ public class JwtTokenService implements TokenService {
     }
 
     @Override
-    public String createToken(TokenData data) throws InvalidKeyException {
+    public String createToken(UserData data) throws InvalidKeyException {
         
         Date now = Date.from(Instant.now());
         Date expiredAt = Date.from(Instant.ofEpochMilli(now.toInstant().toEpochMilli()+ timeout));
@@ -47,12 +47,12 @@ public class JwtTokenService implements TokenService {
         JwtBuilder builder = Jwts.builder();
         
         builder.setSubject(data.getEmail());
-        builder.setIssuer("CHATAJA");
-        builder.setIssuedAt(Date.from(Instant.now()));
+        builder.setIssuer("CAW");
+        //builder.setIssuedAt(Date.from(Instant.now()));
         builder.setExpiration(expiredAt);
         builder.claim("clientAddress", data.getClientAddress());
-        builder.claim("fullname", data.getFullname());
-        builder.claim("mobileNo", data.getMobileNumber());
+        //builder.claim("fullname", data.getFullname());
+        //builder.claim("mobileNo", data.getMobileNumber());
         
         String token = null;
         try {
@@ -67,17 +67,14 @@ public class JwtTokenService implements TokenService {
     }
     
     @Override
-    public TokenData readTokenData(String token) throws ExpiredJwtException, MalformedJwtException, UnsupportedJwtException, SignatureException, IllegalArgumentException {
+    public UserData readTokenData(String token) throws ExpiredJwtException, MalformedJwtException, UnsupportedJwtException, SignatureException, IllegalArgumentException {
         
-        TokenData data = null;
+        UserData data = null;
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(this.key).parseClaimsJws(token);
             
-            data = new TokenData(
-                    claims.getBody().getSubject(),
-                    claims.getBody().get("mobileNo").toString(),
-                    claims.getBody().get("fullname").toString()
-            );
+            data = new UserData();
+            data.setEmail(claims.getBody().getSubject());
             data.setClientAddress(claims.getBody().get("clientAddress").toString());
         } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | SignatureException | IllegalArgumentException ex) {
             throw ex;
