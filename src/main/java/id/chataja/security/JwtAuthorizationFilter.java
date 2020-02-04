@@ -8,7 +8,7 @@ package id.chataja.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import id.chataja.security.model.UserData;
 import id.chataja.security.services.TokenService;
-import id.chataja.util.Misc;
+import id.chataja.util.NetworkHelper;
 import id.chataja.util.rest.ErrorEnvelope;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -56,7 +56,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         
         if (token != null) {
             try {
-                String address = Misc.getClientAddress(req);
+                String address = NetworkHelper.getClientAddress(req);
                 data = tokenService.readTokenData(token.replace(TokenService.TOKEN_PREFIX, ""));
 //                myLogger.info("tokenData = " + data.toString());
                 isValid = data.getClientAddress().equalsIgnoreCase(address);

@@ -11,8 +11,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -90,15 +88,15 @@ public class ApiFacade {
         return res.getBody();
     }
     
-    @GetMapping(value="/info")
-    public ResponseEntity<Map<String,Object>> showInfo() {
-        
-        Map<String, Object> infos = new HashMap();
-        infos.put("baseUrl", this.baseUrl);
-        
-        return new ResponseEntity(infos,HttpStatus.OK);
-        
-    }
+//    @GetMapping(value="/info")
+//    public ResponseEntity<Map<String,Object>> showInfo() {
+//        
+//        Map<String, Object> infos = new HashMap();
+//        infos.put("baseUrl", this.baseUrl);
+//        
+//        return new ResponseEntity(infos,HttpStatus.OK);
+//        
+//    }
 
     @GetMapping(value="/**")
     public ResponseEntity<Map<String,Object>> getMethodHandler(

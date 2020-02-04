@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author ahmad
  */
-public class Misc {
+public class NetworkHelper {
     
     private static final String[] IP_HEADER_CANDIDATES = { 
         "X-Forwarded-For",

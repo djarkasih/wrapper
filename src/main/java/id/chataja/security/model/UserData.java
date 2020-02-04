@@ -6,6 +6,10 @@
 package id.chataja.security.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Transient;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -14,20 +18,30 @@ import javax.validation.constraints.Size;
  *
  * @author ahmad
  */
+@Entity
 public class UserData {
+    
+    @Id
+    @GeneratedValue
+    private Long id;
     
     @NotBlank(message = "clientId is mandatory")
     private String clientId;
     @JsonIgnore
-    private String clientAddress;
+    @Transient
+    private String clientAddress = "EMPTY";
     @Email(message = "email should be in valid email address format")
     private String email;
     @NotBlank(message = "mobileNumber is mandatory")
     private String mobileNumber;
-    @Size(min = 10, max = 200, message = "fullname must be between 2 and 64 characters")
+    @Size(min = 8, max = 64, message = "fullname must be between 8 and 64 characters")
     private String fullname;
 
     public UserData() {        
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getClientId() {
@@ -72,7 +86,7 @@ public class UserData {
 
     @Override
     public String toString() {
-        return "TokenData{" + "clientId=" + clientId + ", clientAddress=" + clientAddress + ", email=" + email + ", mobileNumber=" + mobileNumber + ", fullname=" + fullname + '}';
+        return "UserData{" + "id=" + id + ", clientId=" + clientId + ", clientAddress=" + clientAddress + ", email=" + email + ", mobileNumber=" + mobileNumber + ", fullname=" + fullname + '}';
     }
     
 }

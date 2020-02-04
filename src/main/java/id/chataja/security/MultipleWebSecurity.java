@@ -6,7 +6,6 @@
 package id.chataja.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import id.chataja.security.services.UserQueue;
 import id.chataja.security.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
