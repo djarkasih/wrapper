@@ -9,6 +9,8 @@ import id.chataja.security.jpa.UserDataRepository;
 import id.chataja.security.model.UserData;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +51,14 @@ public class UserQueue {
     private void processQueue() {
         if (queue.size() > 0) {
             
-            UserData data = queue.poll();
+            UserData data = null;
+            
+            try {
+                data = queue.poll(1,TimeUnit.SECONDS);
+            } catch (InterruptedException ex) {
+                java.util.logging.Logger.getLogger(UserQueue.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
             if (data != null) {
                 
                 if (! userDataRepository.existsByEmail(data.getEmail())) {

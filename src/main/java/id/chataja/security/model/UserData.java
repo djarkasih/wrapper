@@ -6,6 +6,8 @@
 package id.chataja.security.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -19,17 +21,18 @@ import javax.validation.constraints.Size;
  * @author ahmad
  */
 @Entity
-public class UserData {
+public class UserData implements Serializable {
     
     @Id
     @GeneratedValue
     private Long id;
     
-    @NotBlank(message = "clientId is mandatory")
-    private String clientId;
+    @JsonIgnore
+    private String clientId = "CA";
     @JsonIgnore
     @Transient
     private String clientAddress = "EMPTY";
+    @Column(unique=true, nullable=false)
     @Email(message = "email should be in valid email address format")
     private String email;
     @NotBlank(message = "mobileNumber is mandatory")

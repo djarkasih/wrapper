@@ -19,6 +19,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,9 @@ public class CredentialEndpoint {
     @Autowired
     private Environment env;
 
+    @Value("${wrapper.client.appid}")
+    private String appId;
+
     @Autowired
     private TokenService tokenService;
     
@@ -47,29 +51,28 @@ public class CredentialEndpoint {
     @Autowired
     private UserQueue queue;
         
-    @GetMapping(value="/info/{clientId}")
-    public ResponseEntity<Map<String,Object>> showInfo(@PathVariable("clientId") String clientId) {
+    @GetMapping(value="/info")
+    public ResponseEntity<Map<String,Object>> showInfo() {
         
         Map<String, Object> infos = new HashMap();
-        infos.put(clientId + " user(s) : ", repo.countByClientId(clientId) + " user(s)");
+        infos.put(this.appId + " user(s) : ", repo.countByClientId(this.appId) + " user(s)");
         infos.put("User queue length : ", queue.length() + " job(s)");
         
         return new ResponseEntity(infos,HttpStatus.OK);
         
     }
 
-    @GetMapping(value="/users/{clientId}")
-    public ResponseEntity<SimpleEnvelope> getUsers(@PathVariable("clientId") String clientId) {
+    @GetMapping(value="/users")
+    public ResponseEntity<SimpleEnvelope> getUsers() {
         
         Set<String> profiles = Set.of(env.getActiveProfiles());
         
         Map<String, Object> data = new HashMap();
-        data.put(clientId + " user(s) : ", repo.countByClientId(clientId) + " user(s)");
+        data.put(this.appId + " user(s) : ", repo.countByClientId(this.appId) + " user(s)");
         List<UserData> users = null;
         
         if (profiles.contains("dev")) {
-            users = new ArrayList();
-            repo.findAll().forEach(users::add);
+            users = repo.findByClientId(this.appId);
             
             data.put("data", users);
         }
@@ -84,6 +87,7 @@ public class CredentialEndpoint {
     public ResponseEntity<SimpleEnvelope> createToken(HttpServletRequest req, @RequestBody @Valid UserData data) {
         
         Map<String, String> out = new HashMap();
+        data.setClientId(this.appId);
         data.setClientAddress(NetworkHelper.getClientAddress(req));
         
         queue.push(data);
@@ -94,9 +98,6 @@ public class CredentialEndpoint {
         
         SimpleEnvelope env = new SimpleEnvelope(out,true,HttpStatus.OK.value());
         
-        //HttpHeaders headers = new HttpHeaders();
-        //headers.set(TokenService.AUTHORIZATION_HEADER, TokenService.TOKEN_PREFIX + token);
-
         return new ResponseEntity(env,HttpStatus.OK);
         
     } 
