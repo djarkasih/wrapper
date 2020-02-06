@@ -29,14 +29,19 @@ public class UserData implements Serializable {
     
     @JsonIgnore
     private String clientId = "CA";
-    @JsonIgnore
+    
     @Transient
+    @JsonIgnore
     private String clientAddress = "EMPTY";
+    
     @Column(unique=true, nullable=false)
+    @NotBlank(message = "email is mandatory")
     @Email(message = "email should be in valid email address format")
     private String email;
+    
     @NotBlank(message = "mobileNumber is mandatory")
     private String mobileNumber;
+    
     @Size(min = 8, max = 64, message = "fullname must be between 8 and 64 characters")
     private String fullname;
 

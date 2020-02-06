@@ -6,11 +6,13 @@
 package id.chataja.middleware.controller;
 
 import id.chataja.middleware.model.RequestData;
+import id.chataja.middleware.service.RequestInterceptor;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -37,6 +39,9 @@ public class ApiFacade {
     @Value("${wrapper.target.baseurl}")
     private String baseUrl;
     
+    @Autowired
+    private RequestInterceptor interceptor;
+
     private Map<String, String> extractRequestHeaders(HttpServletRequest req) {
 
         Map<String,String> headers = new HashMap();
@@ -68,6 +73,8 @@ public class ApiFacade {
             headers.add(name, value);
         });
         
+        interceptor.injectHeaders(headers);
+        
         if (headers.containsKey("accept-encoding"))
             headers.remove("accept-encoding");
         
@@ -87,16 +94,6 @@ public class ApiFacade {
         
         return res.getBody();
     }
-    
-//    @GetMapping(value="/info")
-//    public ResponseEntity<Map<String,Object>> showInfo() {
-//        
-//        Map<String, Object> infos = new HashMap();
-//        infos.put("baseUrl", this.baseUrl);
-//        
-//        return new ResponseEntity(infos,HttpStatus.OK);
-//        
-//    }
 
     @GetMapping(value="/**")
     public ResponseEntity<Map<String,Object>> getMethodHandler(
