@@ -5,7 +5,7 @@
  */
 package id.chataja.security.services;
 
-import id.chataja.security.model.UserData;
+import id.chataja.security.model.TokenData;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -39,7 +39,7 @@ public class JwtTokenService implements TokenService {
     }
 
     @Override
-    public String createToken(UserData data) throws InvalidKeyException {
+    public String createToken(TokenData data) throws InvalidKeyException {
         
         Date now = Date.from(Instant.now());
         Date expiredAt = Date.from(Instant.ofEpochMilli(now.toInstant().toEpochMilli()+ timeout));
@@ -67,13 +67,13 @@ public class JwtTokenService implements TokenService {
     }
     
     @Override
-    public UserData readTokenData(String token) throws ExpiredJwtException, MalformedJwtException, UnsupportedJwtException, SignatureException, IllegalArgumentException {
+    public TokenData readTokenData(String token) throws ExpiredJwtException, MalformedJwtException, UnsupportedJwtException, SignatureException, IllegalArgumentException {
         
-        UserData data = null;
+        TokenData data = null;
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(this.key).parseClaimsJws(token);
             
-            data = new UserData();
+            data = new TokenData();
             data.setEmail(claims.getBody().getSubject());
             data.setClientAddress(claims.getBody().get("clientAddress").toString());
         } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | SignatureException | IllegalArgumentException ex) {

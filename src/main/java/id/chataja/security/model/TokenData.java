@@ -21,14 +21,13 @@ import javax.validation.constraints.Size;
  * @author ahmad
  */
 @Entity
-public class UserData implements Serializable {
+public class TokenData implements Serializable {
     
     @Id
     @GeneratedValue
     private Long id;
     
-    @JsonIgnore
-    private String clientId = "CA";
+    //private String clientId = "CA";
     
     @Transient
     @JsonIgnore
@@ -45,19 +44,11 @@ public class UserData implements Serializable {
     @Size(min = 8, max = 64, message = "fullname must be between 8 and 64 characters")
     private String fullname;
 
-    public UserData() {        
+    public TokenData() {        
     }
 
     public Long getId() {
         return id;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
     }
 
     public String getClientAddress() {
@@ -94,7 +85,7 @@ public class UserData implements Serializable {
 
     @Override
     public String toString() {
-        return "UserData{" + "id=" + id + ", clientId=" + clientId + ", clientAddress=" + clientAddress + ", email=" + email + ", mobileNumber=" + mobileNumber + ", fullname=" + fullname + '}';
+        return "UserData{" + "id=" + id + ", clientAddress=" + clientAddress + ", email=" + email + ", mobileNumber=" + mobileNumber + ", fullname=" + fullname + '}';
     }
     
 }

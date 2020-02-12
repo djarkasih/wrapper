@@ -5,7 +5,7 @@
  */
 package id.chataja.security.services;
 
-import id.chataja.security.model.UserData;
+import id.chataja.security.model.TokenData;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -22,7 +22,7 @@ public interface TokenService {
     public final static String AUTHORIZATION_HEADER = "Authorization";
     public static final String TOKEN_SERVICE_URL = "/token";
     
-    public String createToken(UserData data) throws InvalidKeyException;
-    public UserData readTokenData(String token) throws ExpiredJwtException, MalformedJwtException, UnsupportedJwtException, SignatureException, IllegalArgumentException;
+    public String createToken(TokenData data) throws InvalidKeyException;
+    public TokenData readTokenData(String token) throws ExpiredJwtException, MalformedJwtException, UnsupportedJwtException, SignatureException, IllegalArgumentException;
     
 }
